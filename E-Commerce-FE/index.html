@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+     <title>E-commerce</title>
+ 
+    <link rel="stylesheet" href="css/bootstrap.min.css"> 
+    <link rel="stylesheet" href="css/font-awesome.min.css"> 
+	<link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet"> 
+    <link rel="stylesheet" href="css/custom.css"> 
+     
+  </head>
+  <body> 
+    <header class="header mb-5">  
+      <nav class="navbar navbar-expand-lg">
+        <div class="container"><a href="index.html" class="navbar-brand home"><img src="img/logo.png" alt="Obaju logo" class="d-none d-md-inline-block"><img src="img/logo-small.png" alt="Obaju logo" class="d-inline-block d-md-none"><span class="sr-only">Obaju - go to homepage</span></a>
+           <div id="navigation" class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item"><a href="#" class="nav-link active">Home</a></li>
+            </ul> 
+			<div class="navbar-buttons d-flex justify-content-end">
+				<div id="cartoverview" style="display:none !important" class="navbar-collapse collapse d-none d-lg-block">
+					<a href="basket.html" class="btn btn-primary navbar-btn">
+						<i class="fa fa-shopping-cart"></i>
+						<span id="sCartCount">3 items in cart</span>
+					</a>
+				</div>
+				<div id="loginDiv" style="display:none !important" class="navbar-collapse collapse d-none d-lg-block">
+					<a href="registration.html" class="btn btn-primary navbar-btn"> 
+						<span>Sign In / Sign Up</span>
+					</a>
+				</div>
+			</div>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <div id="all">
+      <div id="content">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+			 <div class="box info-bar">
+                <div class="row">
+                  <div class="col-md-12 col-lg-4 products-showing">Showing <strong>12</strong> of <strong>25</strong> products</div>
+                  <div class="col-md-12 col-lg-7 products-number-sort">
+                    <form class="form-inline d-block d-lg-flex justify-content-between flex-column flex-md-row">
+                      <div class="products-number"><strong>Show</strong><a href="#" class="btn btn-sm btn-primary">12</a><a href="#" class="btn btn-outline-secondary btn-sm">24</a><a href="#" class="btn btn-outline-secondary btn-sm">All</a><span>products</span></div>
+                      <div class="products-sort-by mt-2 mt-lg-0"><strong>Sort by</strong>
+                        <select name="sort-by" class="form-control">
+                          <option>Price</option>
+                          <option>Name</option>
+                          <option>Sales first</option>
+                        </select>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="row products" id="productDiv">
+                 
+              </div>
+              <div class="pages">
+            </div> 
+          </div>
+        </div>
+      </div>
+    </div> 
+    <div id="copyright">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-6 mb-2 mb-lg-0">
+            <p class="text-center text-lg-left">©2018 .</p>
+          </div 
+        </div>
+      </div>
+    </div>
+    <!-- *** COPYRIGHT END ***-->
+    <!-- JavaScript files-->
+    <script src="js/jquery-3.3.1.min.js"></script> 
+    <script src="js/bootstrap.min.js"></script> 
+	<script>  
+	
+		$(function(){ 
+			checkUserName();
+			showProducts(); 
+		});
+		
+		function checkUserName(){
+			if(localStorage.getItem('userid') !='undefined')
+			{
+				$.ajax({
+					url:'http://localhost:3000/api/users/getUserInfo',
+					dataType :'json',
+					type:'GET',
+					contentType :'application/json',
+					data: JSON.stringify({
+						userId : localStorage.getItem('userid')
+					}),
+					success: function(e){
+						if(e.code==200)
+						{
+							console.log(e.data); 								
+							$('#loginDiv').hide();
+							$('#cartoverview').show(); 
+						} 						
+						else{ 
+							$('#loginDiv').show();
+							$('#cartoverview').hide();
+						}
+					}
+				});  
+			}
+			else{ 
+				$('#loginDiv').show();
+				$('#cartoverview').hide();
+			}
+		}
+		
+		function showProducts(){
+			$.ajax({
+				url:'http://localhost:3000/api/users/getProducts',
+				dataType :'json',
+				type:'GET',
+				contentType :'application/json',
+				success: function(e){
+					console.log(e.data);
+					if(e.code==200)
+					{
+						var productDiv='';
+						alert(e.data.length);
+						$(e.data).each(function(){
+						    console.log(this); 
+							productDiv += '<div class="col-lg-3 col-md-4">\
+												  <div class="product">\
+													<a href="detail.html" class="invisible">\
+														<img src="'+this.image+'" alt="" class="img-fluid">\
+													</a>\
+													<div class="text">\
+													  <h3><a href="detail.html?id='+this._id+'">Fur coat with very but very very long name</a></h3>\
+													  <p class="price">\
+														<del></del>$ '+(this.pricing ||0)+'\
+													  </p>\
+													  <p class="buttons"><a href="detail.html?id='+this._id+'" class="btn btn-outline-secondary">View detail</a>\
+													  <a href="javascript:void(0)" class="btn btn-primary"><i class="fa fa-shopping-cart"></i>Add to cart</a></p>\
+													</div>\
+												  </div>\
+											  </div>';
+						});
+						$('#productDiv').html(productDiv);
+					}
+				}
+			}); 
+		}
+		
+	</script> 
+  </body>
+</html>
